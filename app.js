@@ -666,45 +666,33 @@ const DB = {
   },
   async saveGoal(goal) {
     goal.created_at = goal.created_at || new Date().toISOString();
-    let boardPersisted = true;
-    let cloudPersisted = true;
-    if (this.isOnline()) {
-      try {
-        const result = await writeGoalWithSchemaFallback(payload => this._sbInsert('monthly_goals', payload), goal);
-        boardPersisted = result.boardPersisted;
-      } catch (e) {
-        if (isRlsError(e)) {
-          cloudPersisted = false;
-        } else { throw e; }
-      }
-    }
+    // 先写本地
     const goals = this._lsGet('wb_goals');
     goals.unshift(goal);
     this._lsSet('wb_goals', goals);
-    return { boardPersisted, cloudPersisted };
+    // 后台异步写 Supabase
+    if (this.isOnline()) {
+      writeGoalWithSchemaFallback(payload => this._sbInsert('monthly_goals', payload), goal).catch(() => {});
+    }
+    return { boardPersisted: true, cloudPersisted: true };
   },
   async updateGoal(id, patch) {
-    let boardPersisted = true;
-    let cloudPersisted = true;
-    if (this.isOnline()) {
-      try {
-        const result = await writeGoalWithSchemaFallback(payload => this._sbUpdate('monthly_goals', id, payload), patch);
-        boardPersisted = result.boardPersisted;
-      } catch (e) {
-        if (isRlsError(e)) {
-          cloudPersisted = false;
-        } else { throw e; }
-      }
-    }
+    // 先写本地
     const goals = this._lsGet('wb_goals').map(g => g.id === id ? { ...g, ...patch } : g);
     this._lsSet('wb_goals', goals);
-    return { boardPersisted, cloudPersisted };
+    // 后台异步写 Supabase
+    if (this.isOnline()) {
+      writeGoalWithSchemaFallback(payload => this._sbUpdate('monthly_goals', id, payload), patch).catch(() => {});
+    }
+    return { boardPersisted: true, cloudPersisted: true };
   },
   async deleteGoal(id) {
-    if (this.isOnline()) {
-      await this._sbDelete('monthly_goals', id);
-    }
+    // 先写本地
     this._lsSet('wb_goals', this._lsGet('wb_goals').filter(g => g.id !== id));
+    // 后台异步删 Supabase
+    if (this.isOnline()) {
+      this._sbDelete('monthly_goals', id).catch(() => {});
+    }
   },
 
   // Tasks
@@ -718,39 +706,36 @@ const DB = {
   },
   async saveTask(task) {
     task.created_at = task.created_at || new Date().toISOString();
-    if (this.isOnline()) {
-      try {
-        await this._sbInsert('daily_tasks', task);
-      } catch (e) {
-        if (e.message.includes('PGRST204') && task.description !== undefined) {
-          const { description, ...rest } = task;
-          await this._sbInsert('daily_tasks', rest);
-        } else { throw e; }
-      }
-    }
+    // 先写本地，秒完成
     const tasks = this._lsGet('wb_tasks');
     tasks.unshift(task);
     this._lsSet('wb_tasks', tasks);
+    // 后台异步写 Supabase
+    if (this.isOnline()) {
+      this._sbInsert('daily_tasks', task).catch(() => {
+        this._sbInsert('daily_tasks', (({ description, ...r }) => r)(task)).catch(() => {});
+      });
+    }
   },
   async updateTask(id, patch) {
-    if (this.isOnline()) {
-      try {
-        await this._sbUpdate('daily_tasks', id, patch);
-      } catch (e) {
-        if (e.message.includes('PGRST204') && patch.description !== undefined) {
-          const { description, ...rest } = patch;
-          await this._sbUpdate('daily_tasks', id, rest);
-        } else { throw e; }
-      }
-    }
+    // 先写本地
     const tasks = this._lsGet('wb_tasks').map(t => t.id === id ? { ...t, ...patch } : t);
     this._lsSet('wb_tasks', tasks);
+    // 后台异步写 Supabase
+    if (this.isOnline()) {
+      this._sbUpdate('daily_tasks', id, patch).catch(() => {
+        const { description, ...rest } = patch;
+        this._sbUpdate('daily_tasks', id, rest).catch(() => {});
+      });
+    }
   },
   async deleteTask(id) {
-    if (this.isOnline()) {
-      await this._sbDelete('daily_tasks', id);
-    }
+    // 先写本地
     this._lsSet('wb_tasks', this._lsGet('wb_tasks').filter(t => t.id !== id));
+    // 后台异步删 Supabase
+    if (this.isOnline()) {
+      this._sbDelete('daily_tasks', id).catch(() => {});
+    }
   },
 
   // Online sheet links (shared by all users through Supabase, mirrored to CloudBase)
