@@ -4,7 +4,7 @@ const assert = require('assert');
 const app = fs.readFileSync('app.js', 'utf8');
 const api = fs.readFileSync('cloudfunctions/planner-api/index.js', 'utf8');
 
-assert(app.includes("`${location.origin}/mac-worker/api`"));
+assert(app.includes("`${location.origin}/the-o/api`"));
 assert(app.includes("_cloudRequest(table, action"));
 assert(app.includes('isOnline() { return true; }'));
 assert(app.includes("_failoverQueueKey: 'wb_failover_queue'"));
