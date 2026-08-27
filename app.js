@@ -2379,7 +2379,7 @@ async function handleAction(action, id, el) {
         const del = State.tasks.find(x => x.id === id);
         const delGoalId = del ? (del.goal_id || null) : null;
         await DB.deleteTask(id);
-        await DB.refreshTasks();
+        State.tasks = State.tasks.filter(t => t.id !== id);
         recalcGoalProgress(delGoalId);
         render();
         showToast('已删除');
@@ -2415,12 +2415,14 @@ async function handleAction(action, id, el) {
         if (id) {
           oldGoalId = existing ? (existing.goal_id || null) : null;
           await DB.updateTask(id, data);
+          Object.assign(existing, data);
         } else {
-          await DB.saveTask({ id: uid(), ...data });
+          const newTask = { id: uid(), ...data };
+          await DB.saveTask(newTask);
+          State.tasks.unshift(newTask);
         }
         closeModal();
-        await DB.refreshTasks();
-        // 同步关联目标进度（编辑时旧目标 + 新目标都需重算）
+        // 本地直接更新目标进度，不重新拉取
         if (oldGoalId && oldGoalId !== data.goal_id) recalcGoalProgress(oldGoalId);
         recalcGoalProgress(data.goal_id);
         render();
