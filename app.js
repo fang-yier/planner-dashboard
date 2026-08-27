@@ -2245,7 +2245,7 @@ async function handleAction(action, id, el) {
       if (confirm('确认删除该月目标？')) {
         DB.deleteGoal(id);
         State.goals = State.goals.filter(g => g.id !== id);
-        render();
+        requestAnimationFrame(() => render());
         showToast('已删除');
       }
       break;
@@ -2277,7 +2277,7 @@ async function handleAction(action, id, el) {
           State.goals.unshift(newGoal);
         }
         closeModal();
-        render();
+        requestAnimationFrame(() => render());
         showToast('已保存');
       } catch (e) {
         showToast('保存失败: ' + e.message);
@@ -2300,7 +2300,7 @@ async function handleAction(action, id, el) {
       if (confirm('确认删除该周目标？')) {
         DB.deleteGoal(id);
         State.goals = State.goals.filter(g => g.id !== id);
-        render();
+        requestAnimationFrame(() => render());
         showToast('已删除');
       }
       break;
@@ -2332,7 +2332,7 @@ async function handleAction(action, id, el) {
           State.goals.unshift(newGoal);
         }
         closeModal();
-        render();
+        requestAnimationFrame(() => render());
         showToast('已保存');
       } catch (e) {
         showToast('保存失败: ' + e.message);
@@ -2378,7 +2378,7 @@ async function handleAction(action, id, el) {
         DB.deleteTask(id);
         State.tasks = State.tasks.filter(t => t.id !== id);
         recalcGoalProgress(delGoalId);
-        render();
+        requestAnimationFrame(() => render());
         showToast('已删除');
       }
       break;
@@ -2421,7 +2421,7 @@ async function handleAction(action, id, el) {
         closeModal();
         if (oldGoalId && oldGoalId !== data.goal_id) recalcGoalProgress(oldGoalId);
         recalcGoalProgress(data.goal_id);
-        render();
+        requestAnimationFrame(() => render());
         showToast('已保存');
       } catch (e) {
         showToast('保存失败: ' + e.message);
