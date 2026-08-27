@@ -408,9 +408,7 @@ const DB = {
 
   // CloudBase PostgreSQL（通过同域云函数访问）
   _cloudApiUrl() {
-    return location.protocol === 'file:'
-      ? 'https://the-o-d8gur95h32177d721.tcloudbaseapp.com/the-o/api'
-      : `${location.origin}/the-o/api`;
+    return 'https://the-o-d8gur95h32177d721.service.tcloudbase.com/the-o/api';
   },
   async _cloudRequest(table, action, payload = {}) {
     const r = await fetch(this._cloudApiUrl(), {
