@@ -1,0 +1,13 @@
+{
+  "envId": "the-o-d8gur95h32177d721",
+  "functions": [
+    {
+      "name": "planner-api",
+      "timeout": 15,
+      "memorySize": 256,
+      "runtime": "Nodejs18.15",
+      "handler": "index.main",
+      "installDependency": true
+    }
+  ]
+}

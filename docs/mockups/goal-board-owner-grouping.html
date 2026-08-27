@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>目标板块分组草图</title>
+  <style>
+    :root{--bg:#f4f7fb;--panel:#fff;--ink:#17233c;--muted:#8793a7;--line:#e7ecf4;--blue:#4e72ed;--blue-soft:#edf2ff;--pink:#ff6672;--green:#20b982;--shadow:0 10px 28px rgba(34,55,94,.07)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Microsoft YaHei",system-ui,sans-serif}
+    .app{display:flex;min-height:100vh}.side{width:194px;background:#fff;border-right:1px solid var(--line);padding:18px 12px}.brand{font-size:17px;font-weight:700;padding:0 10px 22px}.brand i{display:inline-block;width:25px;height:25px;border-radius:8px;background:#111;margin-right:9px;vertical-align:middle}.nav{display:grid;gap:7px}.nav div{padding:11px 13px;border-radius:11px;color:#6e7b91}.nav .active{background:#eaf0ff;color:#2862e8;font-weight:700}.main{flex:1;padding:14px 24px 48px;max-width:1420px;margin:auto}.top{height:42px;font-size:18px;font-weight:700;display:flex;align-items:center}.banner{height:175px;border-radius:16px;background:linear-gradient(110deg,#e8f0ff,#fff0f8);padding:31px 28px;margin-bottom:18px}.eyebrow{display:inline-block;padding:5px 11px;border-radius:20px;background:#4f75f1;color:white;font-size:12px;font-weight:700}.banner h1{margin:11px 0 2px;color:#3d63ee;font-size:25px}.banner p{margin:0;color:#4c5d7c}.card{background:var(--panel);border-radius:16px;padding:20px 17px;margin-bottom:16px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.title{font-size:16px;font-weight:700}.hint{color:var(--muted);font-size:12px;font-weight:400;margin-left:8px}.controls{display:flex;gap:8px;align-items:center}.btn{border:0;border-radius:9px;padding:8px 13px;background:#edf2ff;color:#3867ee;font-weight:700}.btn.primary{background:#5278ef;color:#fff}.date{border:1px solid var(--line);padding:7px 10px;border-radius:8px;color:#44516b}.owner-grid,.goal-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}.owner{border:1px solid var(--line);border-radius:12px;padding:14px}.owner h3{margin:0 0 10px;font-size:14px}.task{padding:10px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.task:first-of-type{border-top:0}.task small{display:block;color:var(--muted);margin-top:3px}.pill{white-space:nowrap;border-radius:20px;padding:3px 8px;font-size:11px;background:#fff0d8;color:#bd7a09;height:max-content}.group{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fafbfc}.group-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.group-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#7b6cf6);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}.group-info{flex:1;min-width:0}.group-name{font-weight:700}.group-meta{color:var(--muted);font-size:11px;margin-top:2px}.group-rate{font-weight:800;font-size:20px;color:#5f78ed}.goal-progress{height:4px;background:#eef0f4;border-radius:2px;overflow:hidden;margin-bottom:10px}.goal-progress b{display:block;width:72%;height:100%;background:linear-gradient(90deg,#5b8def,#7b6cf6);border-radius:2px}.goals{display:flex;flex-direction:column;gap:6px}.goal{padding:8px;background:#fff;border-radius:8px;font-size:12px;border:1px solid #f0f2f5}.goal-top{display:flex;align-items:center;gap:6px;min-width:0}.goal-title{font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.goal-tags{display:flex;gap:5px;align-items:center;margin-left:auto;flex-shrink:0}.tag{padding:2px 7px;border-radius:20px;background:var(--blue-soft);color:#4269dc;font-size:11px}.tag.owner{background:#edf9f4;color:#139469}.goal-desc{color:var(--muted);font-size:11px;margin-top:5px}.goal-foot{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;margin-top:5px}.dots{text-align:center;color:#5874ed;margin-top:14px;letter-spacing:5px}.placeholder{color:var(--muted);font-size:13px}
+    @media(max-width:900px){.side{width:70px}.brand{font-size:0}.brand i{margin:0}.nav div{font-size:0;text-align:center}.main{padding:12px}.owner-grid{grid-template-columns:1fr}.goal-top{align-items:flex-start;flex-direction:column}.goal-tags{justify-content:flex-start}.banner{height:auto;min-height:150px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="side"><div class="brand"><i></i><span>工作台</span></div><nav class="nav"><div class="active">▦　仪表盘</div><div>▤　月目标</div><div>☑　周目标</div><div>☷　每日待办</div><div>▥　进度看板</div><div>⚙　设置</div></nav></aside>
+    <main class="main">
+      <div class="top">仪表盘</div>
+      <section class="banner"><span class="eyebrow">高效 · 协同 · 可视化</span><h1>计划表 + 进度看板</h1><p>月目标拆解到每日待办 · 完成率仪表盘 · 多人实时协同</p></section>
+
+      <section class="card">
+        <div class="head"><div><span class="title">成员待办（按人分组）</span><span class="hint">按日期查看每人工作内容、状态、优先级</span></div><div class="controls"><button class="btn">‹</button><span class="date">2026/08/18　▣</span><button class="btn">›</button><button class="btn">今天</button><button class="btn primary">+ 添加待办</button></div></div>
+        <div class="owner-grid">
+          <article class="owner"><h3>张三</h3><div class="task"><div>制作首页改版方案<small>预估 2 小时 · 进行中</small></div><span class="pill">高</span></div><div class="task"><div>整理活动素材<small>预估 1 小时 · 未开始</small></div><span class="pill">中</span></div></article>
+          <article class="owner"><h3>李四</h3><div class="task"><div>会员权益文案确认<small>预估 1.5 小时 · 审核中</small></div><span class="pill">高</span></div></article>
+          <article class="owner"><h3>王五</h3><div class="placeholder">该日期暂无成员待办</div></article>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="head"><div><span class="title">周目标概览</span><span class="hint">本周聚焦 · 平均进度 72% · 共 3 项</span></div><button class="btn primary">+ 添加周目标</button></div>
+        <div class="goal-groups">
+          <div class="group"><div class="group-head"><span class="group-name">页面</span><span class="group-meta">2 项 · 平均进度 78%</span></div><div class="goals"><article class="goal"><div class="goal-top"><span class="goal-title">首页转化页优化</span><div class="goal-tags"><span class="tag">页面</span><span class="tag owner">负责人：张三</span></div></div><div class="goal-desc">完成首屏结构、文案和转化路径调整</div><div class="goal-foot"><span>2026-W34</span><span>进行中</span><div class="progress"><b></b></div><strong>80%</strong></div></article></div></div>
+          <div class="group"><div class="group-head"><span class="group-name">推广</span><span class="group-meta">1 项 · 平均进度 60%</span></div><div class="goals"><article class="goal" style="border-left-color:#20b982"><div class="goal-top"><span class="goal-title">小红书投放素材准备</span><div class="goal-tags"><span class="tag">推广</span><span class="tag owner">负责人：李四</span></div></div><div class="goal-desc">完成 6 组素材和投放节奏确认</div><div class="goal-foot"><span>2026-W34</span><span>进行中</span><div class="progress"><b style="width:60%;background:#20b982"></b></div><strong>60%</strong></div></article></div></div>
+        </div><div class="dots">━　·</div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
