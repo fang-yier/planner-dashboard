@@ -670,9 +670,11 @@ const DB = {
     const goals = this._lsGet('wb_goals');
     goals.unshift(goal);
     this._lsSet('wb_goals', goals);
-    // 后台异步写 Supabase
+    // 后台异步写 Supabase，失败时提示
     if (this.isOnline()) {
-      writeGoalWithSchemaFallback(payload => this._sbInsert('monthly_goals', payload), goal).catch(() => {});
+      writeGoalWithSchemaFallback(payload => this._sbInsert('monthly_goals', payload), goal)
+        .then(r => { if (!r.boardPersisted) showToast('板块字段未被云端识别，请执行完整迁移 SQL 后重试'); })
+        .catch(e => { if (isRlsError(e)) showToast('云端 RLS 未放行，请先执行完整迁移 SQL；本次仅暂存本机'); });
     }
     return { boardPersisted: true, cloudPersisted: true };
   },
@@ -680,9 +682,11 @@ const DB = {
     // 先写本地
     const goals = this._lsGet('wb_goals').map(g => g.id === id ? { ...g, ...patch } : g);
     this._lsSet('wb_goals', goals);
-    // 后台异步写 Supabase
+    // 后台异步写 Supabase，失败时提示
     if (this.isOnline()) {
-      writeGoalWithSchemaFallback(payload => this._sbUpdate('monthly_goals', id, payload), patch).catch(() => {});
+      writeGoalWithSchemaFallback(payload => this._sbUpdate('monthly_goals', id, payload), patch)
+        .then(r => { if (!r.boardPersisted) showToast('板块字段未被云端识别，请执行完整迁移 SQL 后重试'); })
+        .catch(e => { if (isRlsError(e)) showToast('云端 RLS 未放行，请先执行完整迁移 SQL；本次仅暂存本机'); });
     }
     return { boardPersisted: true, cloudPersisted: true };
   },
@@ -2239,8 +2243,9 @@ async function handleAction(action, id, el) {
     }
     case 'del-goal':
       if (confirm('确认删除该月目标？')) {
-        await DB.deleteGoal(id);
-        await DB.refreshGoals();
+        DB.deleteGoal(id);
+        State.goals = State.goals.filter(g => g.id !== id);
+        render();
         showToast('已删除');
       }
       break;
@@ -2262,15 +2267,18 @@ async function handleAction(action, id, el) {
       // 状态与完成率联动：已完成 -> 100%
       if (data.status === '已完成' && data.progress < 1) data.progress = 1;
       try {
-        let result;
         if (id) {
-          result = await DB.updateGoal(id, data);
+          DB.updateGoal(id, data);
+          const g = State.goals.find(x => x.id === id);
+          if (g) Object.assign(g, data);
         } else {
-          result = await DB.saveGoal({ id: uid(), ...data });
+          const newGoal = { id: uid(), ...data };
+          DB.saveGoal(newGoal);
+          State.goals.unshift(newGoal);
         }
         closeModal();
-        await DB.refreshGoals();
-        showToast(result && result.cloudPersisted === false ? '云端 RLS 未放行，请先执行完整迁移 SQL；本次仅暂存本机' : result && result.boardPersisted === false ? '板块字段未被云端识别，请执行完整迁移 SQL 后重试' : '已保存');
+        render();
+        showToast('已保存');
       } catch (e) {
         showToast('保存失败: ' + e.message);
         console.error('save-goal error:', e);
@@ -2290,8 +2298,9 @@ async function handleAction(action, id, el) {
     }
     case 'del-weekgoal':
       if (confirm('确认删除该周目标？')) {
-        await DB.deleteGoal(id);
-        await DB.refreshGoals();
+        DB.deleteGoal(id);
+        State.goals = State.goals.filter(g => g.id !== id);
+        render();
         showToast('已删除');
       }
       break;
@@ -2313,15 +2322,18 @@ async function handleAction(action, id, el) {
       // 状态与完成率联动：已完成 -> 100%
       if (data.status === '已完成' && data.progress < 1) data.progress = 1;
       try {
-        let result;
         if (id) {
-          result = await DB.updateGoal(id, data);
+          DB.updateGoal(id, data);
+          const g = State.goals.find(x => x.id === id);
+          if (g) Object.assign(g, data);
         } else {
-          result = await DB.saveGoal({ id: 'week_' + uid(), ...data });
+          const newGoal = { id: 'week_' + uid(), ...data };
+          DB.saveGoal(newGoal);
+          State.goals.unshift(newGoal);
         }
         closeModal();
-        await DB.refreshGoals();
-        showToast(result && result.cloudPersisted === false ? '云端 RLS 未放行，请先执行完整迁移 SQL；本次仅暂存本机' : result && result.boardPersisted === false ? '板块字段未被云端识别，请执行完整迁移 SQL 后重试' : '已保存');
+        render();
+        showToast('已保存');
       } catch (e) {
         showToast('保存失败: ' + e.message);
         console.error('save-weekgoal error:', e);
@@ -2363,7 +2375,7 @@ async function handleAction(action, id, el) {
       if (confirm('确认删除该待办？')) {
         const del = State.tasks.find(x => x.id === id);
         const delGoalId = del ? (del.goal_id || null) : null;
-        await DB.deleteTask(id);
+        DB.deleteTask(id);
         State.tasks = State.tasks.filter(t => t.id !== id);
         recalcGoalProgress(delGoalId);
         render();
@@ -2399,15 +2411,14 @@ async function handleAction(action, id, el) {
         let oldGoalId = null;
         if (id) {
           oldGoalId = existing ? (existing.goal_id || null) : null;
-          await DB.updateTask(id, data);
+          DB.updateTask(id, data);
           Object.assign(existing, data);
         } else {
           const newTask = { id: uid(), ...data };
-          await DB.saveTask(newTask);
+          DB.saveTask(newTask);
           State.tasks.unshift(newTask);
         }
         closeModal();
-        // 本地直接更新目标进度，不重新拉取
         if (oldGoalId && oldGoalId !== data.goal_id) recalcGoalProgress(oldGoalId);
         recalcGoalProgress(data.goal_id);
         render();
