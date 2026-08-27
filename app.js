@@ -2619,7 +2619,14 @@ async function init() {
     localStorage.setItem('wb_tasks', JSON.stringify(sampleTasks));
   }
 
-  await DB.refresh();
+  // 先从本地缓存加载并立即渲染，页面秒开
+  State.goals = DB._lsGet('wb_goals');
+  State.tasks = DB._lsGet('wb_tasks');
+  applyOnlineSheetLinkRows(DB._lsGet('wb_online_sheet_links'));
+  render();
+
+  // 再从云端静默刷新，有新数据则更新
+  DB.refresh().catch(() => {});
   if (DB.isOnline()) startPolling();
 
   // 未登录则弹出登录框
